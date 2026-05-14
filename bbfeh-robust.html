@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành - BBFEH Robustness Lab</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-hard { background: #fde8e8; color: #8b0000; border: 1px solid #f5a0a0; }
+    .badge-signal { background: #e8f4fd; color: #0b4f6c; border: 1px solid #8ecae6; }
+    .badge-tool { background: #e6f4ea; color: #216e39; border: 1px solid #b7dfc4; }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 { font-size: 12.5pt; color: #1a5276; margin: 10px 0 8px; font-weight: bold; }
+    h4 { font-size: 12pt; color: #2e4053; margin: 16px 0 6px; font-weight: bold; }
+    p { margin-bottom: 10px; }
+    ul, ol { margin: 8px 0 10px 24px; }
+    li { margin-bottom: 5px; }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd { color: #89dceb; }
+    pre .comment { color: #8b93a8; font-style: italic; }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info { background: #e8f4fd; border-left: 5px solid #2196f3; }
+    .box-warning { background: #fff3cd; border-left: 5px solid #ffc107; }
+    .box-danger { background: #fdecea; border-left: 5px solid #f44336; }
+    .box-success { background: #e8f5e9; border-left: 5px solid #4caf50; }
+    .box-note { background: #f3e5f5; border-left: 5px solid #9c27b0; }
+    .box strong { display: inline-block; margin-bottom: 4px; }
+
+    .topology { text-align: center; margin: 18px 0; }
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 28px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 170px;
+    }
+
+    .topo-node.attack { background: #8b0000; }
+    .topo-node.evaluate { background: #216e39; }
+    .topo-node .node-label { font-size: 10pt; opacity: 0.9; }
+    .topo-node .node-ip { font-size: 9pt; opacity: 0.75; font-style: italic; }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 14px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #c0392b;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body { padding: 14px 18px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f5f7fa; }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { border: none; box-shadow: none; padding: 30px 40px; max-width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông — SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">BBFEH Robustness Lab — Đánh giá độ bền của kỹ thuật giấu tin Echo</div>
+      <div class="meta">
+        <span class="badge badge-hard">Mức độ: Trung bình - Khó</span>
+        <span class="badge badge-signal">Audio Steganography</span>
+        <span class="badge badge-tool">Signal Processing</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+    <table>
+      <tr>
+        <th>Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td>Tên Lab</td>
+        <td><code>bbfeh-robust</code></td>
+      </tr>
+      <tr>
+        <td>Mức độ</td>
+        <td>Trung bình - Khó</td>
+      </tr>
+      <tr>
+        <td>Chủ đề</td>
+        <td>Audio Steganography, Echo Hiding, BBFEH, Robustness Evaluation</td>
+      </tr>
+      <tr>
+        <td>Công cụ sử dụng</td>
+        <td><code>ffmpeg</code>, <code>sox</code>, <code>python3</code>, <code>numpy</code>, <code>soundfile</code></td>
+      </tr>
+      <tr>
+        <td>Container</td>
+        <td><code>analyst</code></td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <p>
+      Bài lab giúp sinh viên đánh giá khả năng chịu tác động của kỹ thuật <strong>Bipolar Backward-Forward Echo Hiding</strong>
+      (BBFEH) khi file âm thanh bị xử lý bởi các phép biến đổi tín hiệu phổ biến như nén MP3, lọc thông thấp, thay đổi
+      tần số lấy mẫu và thêm nhiễu. Thay vì chỉ dừng ở việc phát hiện file có giấu tin, sinh viên cần khảo sát xem dấu
+      vết echo còn tồn tại sau từng loại tấn công hay không.
+    </p>
+
+    <h3>Kỹ năng đạt được</h3>
+    <ul>
+      <li>Sử dụng <code>ffmpeg</code> để kiểm tra thông tin audio, nén MP3 và thay đổi tần số lấy mẫu.</li>
+      <li>Sử dụng <code>sox</code> để thống kê audio và thực hiện lọc thông thấp.</li>
+      <li>Tạo tấn công thêm nhiễu bằng Python.</li>
+      <li>Chạy detector để đánh giá trạng thái <code>DETECTED</code> hoặc <code>FAILED</code> của tín hiệu BBFEH.</li>
+      <li>So sánh khả năng tồn tại của BBFEH trước nhiều phép xử lý tín hiệu khác nhau.</li>
+      <li>Hiểu vai trò của Automated Assessment trong Labtainers thông qua <code>checkwork</code>.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+    <p>
+      <strong>Tình huống:</strong> Sinh viên đóng vai trò là chuyên viên phân tích an toàn thông tin số và được giao kiểm
+      tra một file âm thanh nghi ngờ chứa thông tin ẩn bằng kỹ thuật BBFEH. File gốc được cung cấp là
+      <code>audio_samples/secret.wav</code>.
+    </p>
+    <p>
+      <strong>Vấn đề:</strong> Trong thực tế, file âm thanh có thể bị nén, lọc, thêm nhiễu hoặc thay đổi tần số lấy mẫu
+      trong quá trình truyền tải. Các thao tác này có thể làm suy yếu hoặc phá hủy dấu vết echo dùng để giấu tin. Sinh
+      viên cần xác định tấn công nào vẫn cho phép phát hiện BBFEH, tấn công nào làm detector thất bại.
+    </p>
+    <h3>Vai trò của sinh viên: Audio Forensics Analyst</h3>
+
+    <div class="topology">
+      <div class="topo-diagram">
+        <div class="topo-node">
+          <div style="font-weight:bold; font-size:11pt;">secret.wav</div>
+          <div class="node-label">BBFEH audio</div>
+          <div class="node-ip">/home/ubuntu/audio_samples</div>
+        </div>
+        <div class="topo-arrow">
+          <div class="arrow-label">audio attacks</div>
+          <svg width="90" height="16" viewBox="0 0 110 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="8" x2="95" y2="8" stroke="#c0392b" stroke-width="2" />
+            <polygon points="95,3 110,8 95,13" fill="#c0392b" />
+          </svg>
+          <div class="arrow-label">MP3 / LPF / Noise</div>
+        </div>
+        <div class="topo-node attack">
+          <div style="font-weight:bold; font-size:11pt;">attacked.wav</div>
+          <div class="node-label">processed audio</div>
+          <div class="node-ip">mp3, filtered, resampled</div>
+        </div>
+        <div class="topo-arrow">
+          <div class="arrow-label">detect</div>
+          <svg width="90" height="16" viewBox="0 0 110 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="8" x2="95" y2="8" stroke="#216e39" stroke-width="2" />
+            <polygon points="95,3 110,8 95,13" fill="#216e39" />
+          </svg>
+          <div class="arrow-label">BBFEH?</div>
+        </div>
+        <div class="topo-node evaluate">
+          <div style="font-weight:bold; font-size:11pt;">detector.py</div>
+          <div class="node-label">DETECTED / FAILED</div>
+          <div class="node-ip">check robustness</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>Echo Hiding và BBFEH</h3>
+    <p>
+      Echo Hiding là kỹ thuật giấu tin bằng cách thêm các bản sao trễ rất nhỏ của tín hiệu âm thanh gốc. Người nghe khó
+      nhận ra sự thay đổi, nhưng các phép phân tích tương quan có thể phát hiện dấu vết echo. Với BBFEH, tín hiệu echo
+      được kết hợp theo hướng tiến-lùi và có cực tính đối xứng, giúp tăng khả năng ẩn và cải thiện độ bền so với echo
+      hiding đơn giản.
+    </p>
+
+    <h3>Các loại tấn công tín hiệu trong lab</h3>
+    <table>
+      <tr>
+        <th>Tấn công</th>
+        <th>Công cụ</th>
+        <th>Mục đích</th>
+      </tr>
+      <tr>
+        <td>MP3 compression</td>
+        <td><code>ffmpeg</code></td>
+        <td>Kiểm tra BBFEH có tồn tại sau nén mất dữ liệu hay không.</td>
+      </tr>
+      <tr>
+        <td>Low-pass filtering</td>
+        <td><code>sox</code></td>
+        <td>Loại bỏ thành phần tần số cao và quan sát ảnh hưởng đến dấu vết echo.</td>
+      </tr>
+      <tr>
+        <td>Resampling</td>
+        <td><code>ffmpeg</code></td>
+        <td>Thay đổi tần số lấy mẫu, có thể làm sai lệch độ trễ echo.</td>
+      </tr>
+      <tr>
+        <td>Noise attack</td>
+        <td><code>python3</code></td>
+        <td>Thêm nhiễu Gaussian để đánh giá khả năng phát hiện trong môi trường nhiễu.</td>
+      </tr>
+    </table>
+
+    <div class="box box-warning">
+      <strong>Lưu ý:</strong> Một số công cụ như <code>ffmpeg</code> và <code>sox</code> thường in thông tin ra
+      <code>stderr</code> thay vì <code>stdout</code>. Trong lab này, Automated Assessment chủ yếu kiểm tra
+      <code>.bash_history</code>, vì vậy sau khi hoàn thành cần chạy <code>history -a</code>.
+    </div>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+    <p>
+      Sau khi khởi động lab, sinh viên làm việc trong terminal <code>analyst</code>. File âm thanh gốc nằm tại
+      <code>/home/ubuntu/audio_samples/secret.wav</code>. Detector đã được cung cấp tại <code>/home/ubuntu/detector.py</code>.
+    </p>
+
+    <div class="box box-info">
+      <strong>Quy trình chung:</strong><br />
+      Kiểm tra audio → tạo các bản audio bị tấn công → chạy detector trên từng file → so sánh kết quả → lưu lịch sử lệnh
+      bằng <code>history -a</code> → chạy <code>checkwork</code>.
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Chuẩn bị — Kiểm tra môi trường và file âm thanh</div>
+      <div class="task-body">
+        <p>Kiểm tra thư mục làm việc và file được cung cấp:</p>
+        <pre><span class="cmd">ls</span>
+<span class="cmd">ls audio_samples</span></pre>
+        <p>Kiểm tra thông tin file audio bằng <code>ffmpeg</code>:</p>
+        <pre><span class="cmd">ffmpeg -i audio_samples/secret.wav</span></pre>
+        <p>Thống kê tín hiệu audio bằng <code>sox</code>:</p>
+        <pre><span class="cmd">sox audio_samples/secret.wav -n stat</span></pre>
+        <div class="box box-success">
+          <strong>Kết quả kỳ vọng:</strong> Sinh viên xác định được file <code>secret.wav</code> tồn tại, có thể đọc được
+          thông tin định dạng và thống kê tín hiệu.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 — MP3 Compression Attack</div>
+      <div class="task-body">
+        <p>
+          Nén file <code>secret.wav</code> sang MP3 bitrate thấp, sau đó chuyển ngược lại WAV để detector có thể phân tích.
+        </p>
+        <pre><span class="cmd">ffmpeg -i audio_samples/secret.wav -b:a 64k mp3_attack.mp3</span>
+<span class="cmd">ffmpeg -i mp3_attack.mp3 mp3_attack.wav</span></pre>
+        <p>Chạy detector:</p>
+        <pre><span class="cmd">python3 detector.py mp3_attack.wav</span></pre>
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành:</strong> Tạo được <code>mp3_attack.mp3</code>, <code>mp3_attack.wav</code> và kiểm
+          tra được trạng thái BBFEH sau nén MP3.
+        </div>
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong><br />
+          Vì sao nén MP3 có thể làm suy yếu thông tin ẩn trong audio steganography? BBFEH trong lab này còn phát hiện
+          được sau MP3 không?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 — Low-pass Filtering Attack</div>
+      <div class="task-body">
+        <p>
+          Thực hiện lọc thông thấp ở ngưỡng 3000 Hz để loại bỏ một phần thành phần tần số cao của tín hiệu.
+        </p>
+        <pre><span class="cmd">sox audio_samples/secret.wav filtered.wav lowpass 3000</span></pre>
+        <p>Chạy detector:</p>
+        <pre><span class="cmd">python3 detector.py filtered.wav</span></pre>
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành:</strong> Tạo được <code>filtered.wav</code> và kiểm tra được khả năng phát hiện
+          BBFEH sau low-pass filtering.
+        </div>
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong><br />
+          Low-pass filtering ảnh hưởng thế nào đến dấu vết echo trong tín hiệu âm thanh?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 — Resampling Attack</div>
+      <div class="task-body">
+        <p>
+          Thay đổi tần số lấy mẫu của file âm thanh từ 44100 Hz xuống 22050 Hz. Đây là phép biến đổi có khả năng làm sai
+          lệch độ trễ echo, khiến detector thất bại.
+        </p>
+        <pre><span class="cmd">ffmpeg -i audio_samples/secret.wav -ar 22050 resampled.wav</span></pre>
+        <p>Chạy detector:</p>
+        <pre><span class="cmd">python3 detector.py resampled.wav</span></pre>
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành:</strong> Tạo được <code>resampled.wav</code> và ghi nhận trạng thái phát hiện của
+          BBFEH sau resampling.
+        </div>
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong><br />
+          Tại sao thay đổi tần số lấy mẫu có thể làm detector BBFEH thất bại? Liên hệ với khái niệm delay theo số mẫu.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 4 — Noise Attack</div>
+      <div class="task-body">
+        <p>
+          Tạo một file Python để thêm nhiễu Gaussian vào tín hiệu âm thanh gốc.
+        </p>
+        <pre><span class="cmd">nano noise_attack.py</span></pre>
+        <p>Nội dung gợi ý:</p>
+        <pre><span class="cmd">import soundfile as sf
+import numpy as np
+
+x, sr = sf.read("audio_samples/secret.wav")
+noise = 0.03 * np.random.randn(len(x))
+y = x + noise
+sf.write("noise.wav", y, sr)</span></pre>
+        <p>Chạy script:</p>
+        <pre><span class="cmd">python3 noise_attack.py</span></pre>
+        <p>Chạy detector:</p>
+        <pre><span class="cmd">python3 detector.py noise.wav</span></pre>
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành:</strong> Tạo được <code>noise.wav</code> và đánh giá BBFEH sau khi thêm nhiễu.
+        </div>
+        <div class="box box-danger">
+          <strong>Câu hỏi 4:</strong><br />
+          Khi mức nhiễu tăng, khả năng phát hiện echo sẽ thay đổi như thế nào? Vì sao?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 5 — Tổng hợp kết quả Robustness</div>
+      <div class="task-body">
+        <p>Chạy detector trên toàn bộ các file:</p>
+        <pre><span class="cmd">python3 detector.py audio_samples/secret.wav</span>
+<span class="cmd">python3 detector.py mp3_attack.wav</span>
+<span class="cmd">python3 detector.py filtered.wav</span>
+<span class="cmd">python3 detector.py resampled.wav</span>
+<span class="cmd">python3 detector.py noise.wav</span></pre>
+        <p>Kết quả thường gặp trong lab:</p>
+        <table>
+          <tr>
+            <th>File</th>
+            <th>Kết quả kỳ vọng</th>
+            <th>Ý nghĩa</th>
+          </tr>
+          <tr>
+            <td><code>secret.wav</code></td>
+            <td><code>DETECTED</code></td>
+            <td>File gốc còn nguyên dấu vết BBFEH.</td>
+          </tr>
+          <tr>
+            <td><code>mp3_attack.wav</code></td>
+            <td><code>DETECTED</code></td>
+            <td>BBFEH chịu được nén MP3 trong điều kiện lab.</td>
+          </tr>
+          <tr>
+            <td><code>filtered.wav</code></td>
+            <td><code>DETECTED</code></td>
+            <td>BBFEH vẫn tồn tại sau lọc thông thấp.</td>
+          </tr>
+          <tr>
+            <td><code>resampled.wav</code></td>
+            <td><code>FAILED</code></td>
+            <td>Resampling làm sai lệch delay echo khiến detector thất bại.</td>
+          </tr>
+          <tr>
+            <td><code>noise.wav</code></td>
+            <td><code>DETECTED</code></td>
+            <td>BBFEH chịu được mức nhiễu vừa phải.</td>
+          </tr>
+        </table>
+        <p>Lưu lịch sử lệnh để Automated Assessment kiểm tra:</p>
+        <pre><span class="cmd">history -a</span></pre>
+        <p>Chạy kiểm tra:</p>
+        <pre><span class="cmd">checkwork</span></pre>
+        <div class="box box-danger">
+          <strong>Câu hỏi 5:</strong><br />
+          Dựa trên kết quả thực nghiệm, tấn công nào ảnh hưởng mạnh nhất đến BBFEH trong lab này? Giải thích ngắn gọn.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <h2>5. Automated Assessment</h2>
+    <p>
+      Bài lab sử dụng Automated Assessment của Labtainers để kiểm tra lịch sử thao tác trong
+      <code>/home/ubuntu/.bash_history</code>. Các mục chính được kiểm tra gồm:
+    </p>
+    <table>
+      <tr>
+        <th>Check</th>
+        <th>Ý nghĩa</th>
+      </tr>
+      <tr>
+        <td><code>check_audio_1</code></td>
+        <td>Sinh viên đã kiểm tra thông tin/thống kê audio.</td>
+      </tr>
+      <tr>
+        <td><code>create_mp3</code></td>
+        <td>Sinh viên đã tạo tấn công nén MP3 với bitrate 64k.</td>
+      </tr>
+      <tr>
+        <td><code>low_pass</code></td>
+        <td>Sinh viên đã thực hiện lọc thông thấp.</td>
+      </tr>
+      <tr>
+        <td><code>resampling</code></td>
+        <td>Sinh viên đã thực hiện thay đổi tần số lấy mẫu.</td>
+      </tr>
+      <tr>
+        <td><code>create_noise_attack</code></td>
+        <td>Sinh viên đã tạo và chạy script thêm nhiễu.</td>
+      </tr>
+      <tr>
+        <td><code>detector</code></td>
+        <td>Sinh viên đã chạy detector để đánh giá BBFEH.</td>
+      </tr>
+    </table>
+
+    <div class="box box-warning">
+      <strong>Lưu ý quan trọng:</strong> Nếu chạy đầy đủ các lệnh nhưng <code>checkwork</code> chưa đạt, hãy chạy
+      <code>history -a</code> trong terminal <code>analyst</code> trước khi kiểm tra lại.
+    </div>
+
+    <h2>6. Câu hỏi tổng kết</h2>
+    <ol>
+      <li>BBFEH khác gì so với echo hiding một chiều thông thường?</li>
+      <li>Vì sao MP3 compression là một bài kiểm tra quan trọng đối với audio steganography?</li>
+      <li>Tại sao resampling có thể làm detector thất bại dù người nghe vẫn không nhận ra khác biệt rõ ràng?</li>
+      <li>Nếu muốn cải thiện detector để chống resampling, em sẽ thay đổi thuật toán như thế nào?</li>
+      <li>Trong môi trường thực tế, cần kết hợp thêm phép đo nào ngoài kết quả <code>DETECTED/FAILED</code>?</li>
+    </ol>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông — SecLab PTIT</p>
+      <p style="margin-top:4px">Bài thực hành được xây dựng trên nền tảng Labtainers, phục vụ học tập về audio steganography và đánh giá độ bền của kỹ thuật BBFEH.</p>
+    </div>
+
+  </div>
+</body>
+
+</html>
