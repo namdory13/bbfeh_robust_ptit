@@ -282,7 +282,6 @@
       <li>Tạo tấn công thêm nhiễu bằng Python.</li>
       <li>Chạy detector để đánh giá trạng thái <code>DETECTED</code> hoặc <code>FAILED</code> của tín hiệu BBFEH.</li>
       <li>So sánh khả năng tồn tại của BBFEH trước nhiều phép xử lý tín hiệu khác nhau.</li>
-      <li>Hiểu vai trò của Automated Assessment trong Labtainers thông qua <code>checkwork</code>.</li>
     </ul>
 
     <h2>2. Kịch bản</h2>
@@ -375,11 +374,21 @@
 
     <div class="box box-warning">
       <strong>Lưu ý:</strong> Một số công cụ như <code>ffmpeg</code> và <code>sox</code> thường in thông tin ra
-      <code>stderr</code> thay vì <code>stdout</code>. Trong lab này, Automated Assessment chủ yếu kiểm tra
-      <code>.bash_history</code>, vì vậy sau khi hoàn thành cần chạy <code>history -a</code>.
+      <code>stderr</code> thay vì <code>stdout</code>. Khi quan sát kết quả, sinh viên cần đọc kỹ thông báo của từng công cụ
+      để xác định file đầu ra đã được tạo thành công.
     </div>
 
     <h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+    <div class="box box-warning">
+      <strong>Khởi động Lab:</strong><br />
+      Trước khi bắt đầu bài thực hành, sinh viên cần tải image Docker của lab và khởi động môi trường Labtainers bằng các lệnh sau:
+<pre><span class="cmd">imodule https://raw.githubusercontent.com/namdory13/bbfeh_robust_ptit/main/bbfeh-robust.tar.gz</span>
+  <br />
+<span class="cmd">docker pull namdory13/bbfeh-robust.analyst.student:latest</span>
+<span class="cmd">labtainer bbfeh-robust -r</span></pre>
+    </div>
+
     <p>
       Sau khi khởi động lab, sinh viên làm việc trong terminal <code>analyst</code>. File âm thanh gốc nằm tại
       <code>/home/ubuntu/audio_samples/secret.wav</code>. Detector đã được cung cấp tại <code>/home/ubuntu/detector.py</code>.
@@ -387,8 +396,7 @@
 
     <div class="box box-info">
       <strong>Quy trình chung:</strong><br />
-      Kiểm tra audio → tạo các bản audio bị tấn công → chạy detector trên từng file → so sánh kết quả → lưu lịch sử lệnh
-      bằng <code>history -a</code> → chạy <code>checkwork</code>.
+      Kiểm tra audio → tạo các bản audio bị tấn công → chạy detector trên từng file → so sánh kết quả → phân tích độ bền của BBFEH.
     </div>
 
     <div class="task-block">
@@ -504,102 +512,45 @@ sf.write("noise.wav", y, sr)</span></pre>
       </div>
     </div>
 
-    <div class="task-block">
-      <div class="task-header">Nhiệm vụ 5 — Tổng hợp kết quả Robustness</div>
-      <div class="task-body">
-        <p>Chạy detector trên toàn bộ các file:</p>
-        <pre><span class="cmd">python3 detector.py audio_samples/secret.wav</span>
-<span class="cmd">python3 detector.py mp3_attack.wav</span>
-<span class="cmd">python3 detector.py filtered.wav</span>
-<span class="cmd">python3 detector.py resampled.wav</span>
-<span class="cmd">python3 detector.py noise.wav</span></pre>
-        <p>Kết quả thường gặp trong lab:</p>
-        <table>
-          <tr>
-            <th>File</th>
-            <th>Kết quả kỳ vọng</th>
-            <th>Ý nghĩa</th>
-          </tr>
-          <tr>
-            <td><code>secret.wav</code></td>
-            <td><code>DETECTED</code></td>
-            <td>File gốc còn nguyên dấu vết BBFEH.</td>
-          </tr>
-          <tr>
-            <td><code>mp3_attack.wav</code></td>
-            <td><code>DETECTED</code></td>
-            <td>BBFEH chịu được nén MP3 trong điều kiện lab.</td>
-          </tr>
-          <tr>
-            <td><code>filtered.wav</code></td>
-            <td><code>DETECTED</code></td>
-            <td>BBFEH vẫn tồn tại sau lọc thông thấp.</td>
-          </tr>
-          <tr>
-            <td><code>resampled.wav</code></td>
-            <td><code>FAILED</code></td>
-            <td>Resampling làm sai lệch delay echo khiến detector thất bại.</td>
-          </tr>
-          <tr>
-            <td><code>noise.wav</code></td>
-            <td><code>DETECTED</code></td>
-            <td>BBFEH chịu được mức nhiễu vừa phải.</td>
-          </tr>
-        </table>
-        <p>Lưu lịch sử lệnh để Automated Assessment kiểm tra:</p>
-        <pre><span class="cmd">history -a</span></pre>
-        <p>Chạy kiểm tra:</p>
-        <pre><span class="cmd">checkwork</span></pre>
-        <div class="box box-danger">
-          <strong>Câu hỏi 5:</strong><br />
-          Dựa trên kết quả thực nghiệm, tấn công nào ảnh hưởng mạnh nhất đến BBFEH trong lab này? Giải thích ngắn gọn.
-          <br /><strong>Trả lời:</strong> _______________________________________
-        </div>
-      </div>
+    <div class="box box-info">
+      <strong>Ghi chú:</strong> Bảng dưới đây là kết quả thường gặp khi chạy detector trong môi trường lab. Kết quả thực tế có thể thay đổi nhẹ tùy quá trình tạo file và mức nhiễu.
     </div>
 
-    <h2>5. Automated Assessment</h2>
-    <p>
-      Bài lab sử dụng Automated Assessment của Labtainers để kiểm tra lịch sử thao tác trong
-      <code>/home/ubuntu/.bash_history</code>. Các mục chính được kiểm tra gồm:
-    </p>
+    <h3>Kết quả thường gặp trong lab</h3>
     <table>
       <tr>
-        <th>Check</th>
+        <th>File</th>
+        <th>Kết quả kỳ vọng</th>
         <th>Ý nghĩa</th>
       </tr>
       <tr>
-        <td><code>check_audio_1</code></td>
-        <td>Sinh viên đã kiểm tra thông tin/thống kê audio.</td>
+        <td><code>secret.wav</code></td>
+        <td><code>DETECTED</code></td>
+        <td>File gốc còn nguyên dấu vết BBFEH.</td>
       </tr>
       <tr>
-        <td><code>create_mp3</code></td>
-        <td>Sinh viên đã tạo tấn công nén MP3 với bitrate 64k.</td>
+        <td><code>mp3_attack.wav</code></td>
+        <td><code>DETECTED</code></td>
+        <td>BBFEH chịu được nén MP3 trong điều kiện lab.</td>
       </tr>
       <tr>
-        <td><code>low_pass</code></td>
-        <td>Sinh viên đã thực hiện lọc thông thấp.</td>
+        <td><code>filtered.wav</code></td>
+        <td><code>DETECTED</code></td>
+        <td>BBFEH vẫn tồn tại sau lọc thông thấp.</td>
       </tr>
       <tr>
-        <td><code>resampling</code></td>
-        <td>Sinh viên đã thực hiện thay đổi tần số lấy mẫu.</td>
+        <td><code>resampled.wav</code></td>
+        <td><code>FAILED</code></td>
+        <td>Resampling làm sai lệch delay echo khiến detector thất bại.</td>
       </tr>
       <tr>
-        <td><code>create_noise_attack</code></td>
-        <td>Sinh viên đã tạo và chạy script thêm nhiễu.</td>
-      </tr>
-      <tr>
-        <td><code>detector</code></td>
-        <td>Sinh viên đã chạy detector để đánh giá BBFEH.</td>
+        <td><code>noise.wav</code></td>
+        <td><code>DETECTED</code></td>
+        <td>BBFEH chịu được mức nhiễu vừa phải.</td>
       </tr>
     </table>
 
-    <div class="box box-warning">
-      <strong>Lưu ý quan trọng:</strong> Nếu chạy đầy đủ các lệnh nhưng <code>checkwork</code> chưa đạt, hãy chạy
-      <code>history -a</code> trong terminal <code>analyst</code> trước khi kiểm tra lại.
-    </div>
-
-    <h2>6. Câu hỏi tổng kết</h2>
+    <h2>5. Câu hỏi tổng kết</h2>
     <ol>
       <li>BBFEH khác gì so với echo hiding một chiều thông thường?</li>
       <li>Vì sao MP3 compression là một bài kiểm tra quan trọng đối với audio steganography?</li>
